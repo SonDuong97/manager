@@ -17,6 +17,7 @@ class CreateTimesheetsTable extends Migration
             $table->bigIncrements('id');
             $table->text('trouble');
             $table->text('plan_of_next_day');
+            $table->boolean('approved')->default(0)->comment('1:true; 0:false');
             $table->integer('user_id');
             $table->timestamps();
         });
