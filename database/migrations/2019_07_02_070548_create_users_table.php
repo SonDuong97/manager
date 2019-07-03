@@ -21,7 +21,7 @@ class CreateUsersTable extends Migration
             $table->string('avatar', 255)->default(url('\images\default-avatar.jpg'));
             $table->text('description')->nullable();
             $table->boolean('notified')->default(0)->comment('cc; 1:true; 0:false');
-            $table->integer('role_id');
+            $table->string('role', 255)->default('staff');
             $table->integer('manager_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
