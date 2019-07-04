@@ -46,9 +46,10 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
 
-        if (is_array(config('app.domain')) && in_array('admin', config('app.domain'))) {
-            $this->mapAdminRoutes();
-        }
+        $this->mapAdminRoutes();
+//        if (is_array(config('app.domain')) && in_array('admin', config('app.domain'))) {
+//            $this->mapAdminRoutes();
+//        }
     }
 
     /**

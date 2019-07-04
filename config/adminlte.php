@@ -87,13 +87,13 @@ return [
 
     'dashboard_url' => 'admin/',
 
-    'logout_url' => 'admin/logout',
+    'logout_url' => 'logout',
 
     'logout_method' => 'POST',
 
-    'login_url' => 'admin/login',
+    'login_url' => '/login',
 
-    'register_url' => 'admin/register',
+    'register_url' => '/register',
 
     /*
     |--------------------------------------------------------------------------
@@ -115,10 +115,9 @@ return [
             'can'  => 'manage-blog',
         ],
         [
-            'text'        => 'Pages',
-            'url'         => 'admin/pages',
+            'text'        => 'User',
+            'url'         => 'admin/users',
             'icon'        => 'file',
-            'label'       => 4,
             'label_color' => 'success',
         ],
         'ACCOUNT SETTINGS',
