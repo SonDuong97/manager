@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
@@ -19,7 +20,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role',
+        'username', 'email', 'password', 'role_id', 'manager_id',
     ];
 
     /**
@@ -60,6 +61,20 @@ class User extends Authenticatable
 
     public function manager()
     {
-        return $this->hasOne('App\Models\User', 'manager_id');
+        return $this->belongsTo('App\Models\User', 'manager_id');
+    }
+
+    public function role()
+    {
+        return $this->belongsTo('App\Models\Role', 'role_id');
+    }
+    /**
+     * Set password attribute
+     */
+    public function setPasswordAttribute($value)
+    {
+        if ($value && is_string($value) && trim($value)) {
+            $this->attributes['password'] = Hash::make(trim($value));
+        }
     }
 }

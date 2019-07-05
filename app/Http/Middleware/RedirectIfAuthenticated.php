@@ -18,7 +18,7 @@ class RedirectIfAuthenticated
     public function handle($request, Closure $next, $guard = null)
     {
         if (Auth::check()) {
-            if (Auth::user()->role == 'admin') {
+            if (Auth::user()->role->role_name == 'admin') {
                 return redirect()->route('admin.top');
             } else {
                 return redirect()->route('staff.dashboard');

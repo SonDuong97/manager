@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
-use function foo\func;
+use App\Http\Requests\Admin\EditUserRequest;
+use App\Http\Resources\Admin\RoleResource;
+use App\Http\Resources\Admin\UserResource;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Role;
 use Yajra\DataTables\DataTables;
+use App\Http\Requests\Admin\CreateUserRequest;
 
 class UsersController extends Controller
 {
@@ -21,13 +25,20 @@ class UsersController extends Controller
             'id',
             'username',
             'email',
-            'role'
+            'role_id',
+            'manager_id',
         ]);
-
         return DataTables::of($users)
             ->addColumn('manager', function($user) {
                 if (isset($user->manager)) {
                     return $user->manager->username;
+                } else {
+                    return 'N/A';
+                }
+            })
+            ->addColumn('role', function ($user) {
+                if (isset($user->role)) {
+                    return $user->role->role_name;
                 } else {
                     return 'N/A';
                 }
@@ -42,7 +53,10 @@ class UsersController extends Controller
      */
     public function create()
     {
-        //
+        $roles = Role::where('role_name', '!=', 'admin')->get();
+        $managers = Role::where('role_name', 'leader')->first()->user;
+
+        return view('admin.users.create', ['roles'=>$roles, 'managers'=>$managers]);
     }
 
     /**
@@ -51,9 +65,21 @@ class UsersController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateUserRequest $request)
     {
-        return User::create($request);
+        $user = User::create([
+            'username' => $request->input('username'),
+            'password' => $request->input('password'),
+            'email' => $request->input('email'),
+            'avatar' => $request->input('avatar'),
+            'description' => $request->input('description'),
+            'role_id' => $request->input('role'),
+            'manager_id' => $request->input('manager'),
+        ]);
+
+        if ($user) {
+            return redirect()->route('users.create')->with(['success' => 'Successfully!!!']);
+        }
     }
 
     /**
@@ -64,7 +90,7 @@ class UsersController extends Controller
      */
     public function show($id)
     {
-        //
+
     }
 
     /**
@@ -75,7 +101,12 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
-        //
+        $user = User::findOrFail($id);
+        if (!$user) {
+            abort('404');
+        }
+        $roles = Role::where('role_name', '!=', 'admin')->get();
+        return view('admin.users.edit', ['user' => $user, 'roles' => $roles]);
     }
 
     /**
@@ -85,11 +116,16 @@ class UsersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(EditUserRequest $request, $id)
     {
-        $user = User::find($id);
+        $user = User::findOrFail($id);
+        if (!$user) {
+            abort('404');
+        }
 
-        return $user->update($request);
+        if ($user->update($request->all())) {
+            return redirect('admin/users/'.$id.'/edit')->with(['success' => 'Edit successfully!!!']);
+        }
     }
 
     /**

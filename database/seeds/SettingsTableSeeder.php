@@ -13,8 +13,15 @@ class SettingsTableSeeder extends Seeder
     public function run()
     {
         DB::table('settings')->insert([
-            'start_time' => '17:00:00',
-            'end_time' => '19:00:00'
+            [
+                'name' => 'start_time',
+                'value' => '17:00',
+            ],
+            [
+                'name' => 'end_time',
+                'value' => '19:00',
+            ],
+
         ]);
     }
 }

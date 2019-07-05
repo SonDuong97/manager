@@ -21,7 +21,7 @@ class AfterLoginCheckRole
         if (!Auth::check()) {
             return redirect()->route('login');
         } else {
-            if (Auth::user()->role == 'admin') {
+            if (Auth::user()->role->role_name == 'admin') {
                 return redirect()->route('admin.top');
             }
         }
