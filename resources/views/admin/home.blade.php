@@ -43,7 +43,7 @@
                     { data: 'username', name: 'users.username' },
                     { data: 'email', name: 'users.email' },
                     { data: 'role', name: 'users.role' },
-                    { data: 'manager', name: 'users.manager' },
+                    { data: 'manager', name: 'users.manager_id' },
                     {
                         data: 'id',
                         render: function (data, type, row, meta) {
