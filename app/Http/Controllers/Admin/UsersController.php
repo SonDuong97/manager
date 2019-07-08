@@ -123,7 +123,9 @@ class UsersController extends Controller
             abort('404');
         }
 
-        return $user->update($request->all());
+        if ($user->update($request->all())) {
+            return redirect('admin/users/'.$id.'/edit')->with(['success' => 'Edit successfully!!!']);
+        }
     }
 
     /**

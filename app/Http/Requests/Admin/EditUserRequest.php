@@ -24,7 +24,7 @@ class EditUserRequest extends FormRequest
      */
     public function rules()
     {
-        if ($this->password) {
+        if ($this->password || $this->repassword) {
             $passworRules = 'same:repassword|min:6|max:255';
         } else {
             $passworRules = '';
