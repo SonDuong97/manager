@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    protected $redirectTo = '/dashboard';
+    protected $redirectTo = 'staff/dashboard';
     /*
     |--------------------------------------------------------------------------
     | Login Controller

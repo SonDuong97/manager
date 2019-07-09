@@ -101,7 +101,7 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
-        $user = User::findOrFail($id);
+        $user = User::find($id);
         if (!$user) {
             abort('404');
         }
@@ -118,7 +118,7 @@ class UsersController extends Controller
      */
     public function update(EditUserRequest $request, $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::find($id);
         if (!$user) {
             abort('404');
         }

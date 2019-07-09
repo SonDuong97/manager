@@ -24,6 +24,13 @@ class RouteServiceProvider extends ServiceProvider
     protected $adminNamespace = 'App\Http\Controllers\Admin';
 
     /**
+     *Namespace for staff's controllers
+     *
+     * @var string
+     */
+    protected $staffNamespace = 'App\Http\Controllers\Staff';
+
+    /**
      * Define your route model bindings, pattern filters, etc.
      *
      * @return void
@@ -47,6 +54,8 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapWebRoutes();
 
         $this->mapAdminRoutes();
+
+        $this->mapStaffRoutes();
 //        if (is_array(config('app.domain')) && in_array('admin', config('app.domain'))) {
 //            $this->mapAdminRoutes();
 //        }
@@ -87,5 +96,13 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware('web')
             ->namespace($this->adminNamespace)
             ->group(base_path('routes/admin.php'));
+    }
+
+    protected function mapStaffRoutes()
+    {
+        Route::prefix('staff')
+            ->middleware('web')
+            ->namespace($this->staffNamespace)
+            ->group(base_path('routes/staff.php'));
     }
 }

@@ -15,6 +15,7 @@ class CreateTimesheetsTable extends Migration
     {
         Schema::create('timesheets', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->date('date');
             $table->text('trouble');
             $table->text('plan_of_next_day');
             $table->boolean('approved')->default(0)->comment('1:true; 0:false');
