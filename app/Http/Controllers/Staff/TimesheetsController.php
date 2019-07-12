@@ -2,14 +2,22 @@
 
 namespace App\Http\Controllers\Staff;
 
-use App\Http\Requests\Admin\CreateUserRequest;
 use App\Http\Requests\Timesheet\CreateTimesheetRequest;
 use App\Http\Resources\Staff\TimesheetResource;
+use App\Mail\SystemMail;
+use App\Models\MailTemplate;
+use App\Models\Role;
+use App\Models\Setting;
+use App\Models\SummaryLog;
 use App\Models\Task;
 use App\Models\Timesheet;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Yajra\DataTables\DataTables;
 
 class TimesheetsController extends Controller
 {
@@ -28,7 +36,10 @@ class TimesheetsController extends Controller
      */
     public function index()
     {
-        //
+        $timesheets = Timesheet::where(Timesheet::USER_ID_COL, Auth::id());
+
+        return DataTables::of($timesheets)
+            ->make(true);
     }
 
     /**
@@ -67,6 +78,43 @@ class TimesheetsController extends Controller
             ]);
         }
 
+        //Summary logs
+        $now = Carbon::now();
+
+        $summary = SummaryLog::where('from_date', '<=', $now->toDateString())
+                ->where('to_date', '>=', $now->toDateString())
+                ->first();
+        if ($summary) {
+            $registed_time = $summary->registed_time + 1;
+            $delayed_time = $summary->delayed_time;
+
+            if ($this->isDelayed()) {
+                $delayed_time++;
+            }
+
+            $summary->update([
+                'registed_time' => $registed_time,
+                'delayed_time' => $delayed_time,
+            ]);
+        } else {
+            $start = Carbon::now()->startOfMonth()->toDateString();
+            $end = Carbon::now()->endOfMonth()->toDateString();
+
+            SummaryLog::create([
+                'registed_time' => 1,
+                'delayed_time' => $this->isDelayed() ? 1 : 0,
+                'from_date' => $start,
+                'to_date' => $end,
+                'user_id' => Auth::id(),
+            ]);
+        }
+
+        $manager = Auth::user()->manager->email;
+        if (!$manager) {
+            Mail::to($manager)
+                ->queue(new SystemMail(MailTemplate::ACTION_STAFF_CREATED_TIMESHEET));
+        }
+
         return redirect()->route('timesheets.create')->with(['success' => 'Create successfully!!!']);
     }
 
@@ -78,7 +126,11 @@ class TimesheetsController extends Controller
      */
     public function show($id)
     {
-        //
+        $timesheet = new TimesheetResource(Timesheet::where(Timesheet::ID_COL, $id)
+                                                    ->where(Timesheet::USER_ID_COL, Auth::id())
+                                                    ->first());
+
+        return view('staff.timesheets.show', ['timesheet' => $timesheet]);
     }
 
     /**
@@ -89,7 +141,9 @@ class TimesheetsController extends Controller
      */
     public function edit($id)
     {
-        $timesheet = Timesheet::find($id);
+        $timesheet = Timesheet::where(Timesheet::ID_COL, $id)
+                            ->where(Timesheet::USER_ID_COL, Auth::id())
+                            ->first();
         if ($timesheet) {
             $timesheet = new TimesheetResource($timesheet);
 
@@ -107,20 +161,31 @@ class TimesheetsController extends Controller
      */
     public function update(CreateTimesheetRequest $request, $id)
     {
-        $timesheet = Timesheet::find($id);
+        $timesheet = Timesheet::where(Timesheet::ID_COL, $id)
+            ->where(Timesheet::USER_ID_COL, Auth::id())
+            ->first();
         if ($timesheet) {
+            if ($timesheet->approved == Timesheet::APPROVED) {
+                $manager = Auth::user()->manager->email;
+                if (!$manager) {
+                    Mail::to($manager)
+                        ->queue(new SystemMail(MailTemplate::ACTION_STAFF_EDITED_TIMESHEET));
+                }
+            }
+
             $timesheet->update([
                 'date' => date('Y-m-d', strtotime($request->input('date'))),
                 'trouble' => $request->input('trouble'),
                 'plan_of_next_day' => $request->input('plan'),
+                'approved' => Timesheet::NOT_APPROVED,
             ]);
             $tasks = $request->input('tasks');
             foreach ($tasks['contents'] as $key => $value) {
                 $task = Task::find($key);
                 if($task) {
                     $task->update([
-                       'content' => $value,
-                       'used_time' => $tasks['hours'][$key],
+                        'content' => $value,
+                        'used_time' => $tasks['hours'][$key],
                     ]);
                 } else {
                     Task::create([
@@ -145,5 +210,24 @@ class TimesheetsController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function showTimesheetList()
+    {
+        return view('staff.timesheets.index');
+    }
+
+    protected function isDelayed()
+    {
+        $timeNow = Carbon::now()->toTimeString();
+        $endTime = Setting::select(Setting::VALUE_COL)
+            ->where('name', Setting::END_TIMESHEET_COL)
+            ->first()
+            ->value;
+        if ($timeNow > $endTime) {
+            return true;
+        }
+
+        return false;
     }
 }

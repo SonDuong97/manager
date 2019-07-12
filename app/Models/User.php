@@ -59,6 +59,9 @@ class User extends Authenticatable
         'deleted_at'
     ];
 
+    public const COL_ROLE_ID = 'role_id';
+    public const COL_MANAGER_ID = 'manager_id';
+
     public function manager()
     {
         return $this->belongsTo('App\Models\User', 'manager_id');

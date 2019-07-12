@@ -11,4 +11,6 @@ class Setting extends Model
 
     public const START_TIMESHEET_COL = 'start_time';
     public const END_TIMESHEET_COL = 'end_time';
+    public const VALUE_COL = 'value';
+    public const NAME_COL = 'name';
 }

@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
-class AfterLoginCheckRole
+class CheckManagerRole
 {
     /**
      * Handle an incoming request.
@@ -16,18 +16,11 @@ class AfterLoginCheckRole
      */
     public function handle($request, Closure $next)
     {
-        $response = $next($request);
-
-        if (!Auth::check()) {
-            return redirect()->route('login');
+        if (Auth::check())
+            if (Auth::user()->role->role_name == 'manager') {
+                return $next($request);
         }
 
-        if (Auth::user()->role->role_name == 'admin') {
-            return $response;
-        } else {
-            return redirect()->route('staff.dashboard');
-        }
-
-
+        return redirect()->route('login');
     }
 }

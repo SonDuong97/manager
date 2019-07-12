@@ -19,7 +19,7 @@ class RolesTableSeeder extends Seeder
             ],
             [
                 'id' => 2,
-                'role_name' => 'leader'
+                'role_name' => 'manager'
             ],
             [
                 'id' => 3,

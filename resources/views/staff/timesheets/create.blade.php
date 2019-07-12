@@ -84,6 +84,8 @@
 @section('js')
     <script>
         $(document).ready(function () {
+            $('#inputDate').val(new Date().toISOString().slice(0, 10));
+
             $('#addTask').click(function () {
                 let ele = '<label for="" class="col-sm-2 control-label">ID:</label>\n' +
                     '                        <div class="col-sm-10">\n' +
