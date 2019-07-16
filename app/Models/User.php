@@ -71,6 +71,11 @@ class User extends Authenticatable
     {
         return $this->belongsTo('App\Models\Role', 'role_id');
     }
+
+    public function timesheets()
+    {
+        return $this->hasMany('App\Models\Timesheet', 'user_id');
+    }
     /**
      * Set password attribute
      */

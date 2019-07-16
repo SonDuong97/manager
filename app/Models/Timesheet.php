@@ -13,11 +13,17 @@ class Timesheet extends Model
 
     public const USER_ID_COL = 'user_id';
     public const ID_COL = 'id';
+    public const COL_APPROVED = 'approved';
     public const NOT_APPROVED = 0;
     public const APPROVED = 1;
 
     public function tasks()
     {
         return $this->hasMany('App\Models\Task', 'timesheet_id', 'id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User');
     }
 }
