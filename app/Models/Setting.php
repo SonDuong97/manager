@@ -2,15 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Model as AppModel;
 
-class Setting extends Model
+class Setting extends AppModel
 {
     protected $table = 'settings';
-    public $timestamps = true;
+    protected $fillable = [
+        'name',
+        'value',
+        'created_at',
+        'modified_at',
+        'deleted_at',
+    ];
 
-    public const START_TIMESHEET_COL = 'start_time';
-    public const END_TIMESHEET_COL = 'end_time';
-    public const VALUE_COL = 'value';
-    public const NAME_COL = 'name';
+    /**
+     * List of columns
+     * @var string
+     */
+    public const COL_START_TIMESHEET = 'start_time';
+    public const COL_END_TIMESHEET = 'end_time';
+    public const COL_VALUE = 'value';
+    public const COL_NAME = 'name';
 }

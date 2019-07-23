@@ -2,18 +2,31 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Model as AppModel;
 
-class Role extends Model
+class Role extends AppModel
 {
     protected $table = 'roles';
-    protected $fillable = ['role_name'];
-    public $timestamps = true;
-    protected $dates = ['created_at', 'modified_at', 'deleted_at'];
+    protected $fillable = [
+        'role_name',
+        'created_at',
+        'modified_at',
+        'deleted_at',
+    ];
 
+    /**
+     * List of columns
+     * @var string
+     */
     public const COL_ROLE_NAME = 'role_name';
-    public const ROLE_STAFF = 'staff';
-    public const COL_ID = 'id';
+
+    /**
+     * List of roles
+     * @var string
+     */
+    const ROLE_STAFF = 'staff';
+    const ROLE_ADMIN = 'admin';
+    const ROLE_MANAGER = 'manager';
 
     public function user() {
         return $this->hasMany('App\Models\User');

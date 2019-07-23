@@ -2,20 +2,35 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Model as AppModel;
 
-class Timesheet extends Model
+class Timesheet extends AppModel
 {
     protected $table = 'timesheets';
-    protected $fillable = ['date', 'trouble', 'plan_of_next_day', 'user_id'];
-    public $timestamps = true;
-    protected $dates = ['created_at', 'modified_at'];
+    protected $fillable = [
+        'date',
+        'trouble',
+        'plan_of_next_day',
+        'user_id',
+        'approved',
+        'created_at',
+        'modified_at',
+        'deleted_at',
+    ];
 
-    public const USER_ID_COL = 'user_id';
-    public const ID_COL = 'id';
-    public const COL_APPROVED = 'approved';
-    public const NOT_APPROVED = 0;
-    public const APPROVED = 1;
+    /**
+     * List of columns
+     * @var string
+     */
+    const COL_USER_ID = 'user_id';
+    const COL_APPROVED = 'approved';
+
+    /**
+     * List of status timesheet
+     * @var integer
+     */
+    const NOT_APPROVED = 0;
+    const APPROVED = 1;
 
     public function tasks()
     {

@@ -5,23 +5,28 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\Admin\EditUserRequest;
 use App\Http\Resources\Admin\RoleResource;
 use App\Http\Resources\Admin\UserResource;
+use App\Services\Interfaces\RoleServiceInterface;
+use App\Services\Interfaces\UserServiceInterface;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Admin\Controller as AdminController;
 use App\Models\User;
 use App\Models\Role;
 use Yajra\DataTables\DataTables;
 use App\Http\Requests\Admin\CreateUserRequest;
 
-class UsersController extends Controller
+class UsersController extends AdminController
 {
+    protected $userService;
+    protected $roleService;
     /**
      * UsersController constructor.
      */
-    public function __construct()
+    public function __construct(UserServiceInterface $userService, RoleServiceInterface $roleService)
     {
-        $this->middleware(['auth', 'check.role']);
+        parent::__construct();
+        $this->userService = $userService;
+        $this->roleService = $roleService;
     }
-
 
     /**
      * Display a listing of the resource.
@@ -62,10 +67,10 @@ class UsersController extends Controller
      */
     public function create()
     {
-        $roles = Role::where('role_name', '!=', 'admin')->get();
-        $managers = Role::where('role_name', 'leader')->first()->user;
+        $roles = Role::where(Role::COL_ROLE_NAME, '!=', Role::ROLE_ADMIN)->get();
+        $managers = Role::where(Role::COL_ROLE_NAME, Role::ROLE_MANAGER)->first()->user;
 
-        return view('admin.users.create', ['roles'=>$roles, 'managers'=>$managers]);
+        return view('admin.users.create', compact('roles', 'managers'));
     }
 
     /**
@@ -76,30 +81,13 @@ class UsersController extends Controller
      */
     public function store(CreateUserRequest $request)
     {
-        $user = User::create([
-            'username' => $request->input('username'),
-            'password' => $request->input('password'),
-            'email' => $request->input('email'),
-            'avatar' => $request->input('avatar'),
-            'description' => $request->input('description'),
-            'role_id' => $request->input('role'),
-            'manager_id' => $request->input('manager'),
-        ]);
-
-        if ($user) {
+        if ($this->userService->createUser($request)) {
             return redirect()->route('users.create')->with(['success' => 'Successfully!!!']);
+        } else {
+            return redirect()->route('users.create')->withErrors([
+                'message' => 'Create user failed!!!',
+            ]);
         }
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-
     }
 
     /**
@@ -111,11 +99,12 @@ class UsersController extends Controller
     public function edit($id)
     {
         $user = User::find($id);
-        if (!$user) {
-            abort('404');
+        $roles = $this->roleService->getRoleListExceptAdminRole();
+        if ($user && $roles) {
+            return view('admin.users.edit', compact('user', 'roles'));
         }
-        $roles = Role::where('role_name', '!=', 'admin')->get();
-        return view('admin.users.edit', ['user' => $user, 'roles' => $roles]);
+
+        abort(500, 'User not found!!!');
     }
 
     /**
@@ -128,13 +117,13 @@ class UsersController extends Controller
     public function update(EditUserRequest $request, $id)
     {
         $user = User::find($id);
-        if (!$user) {
-            abort('404');
+        if ($user) {
+            if ($this->userService->updateUser($user, $request)) {
+                return redirect()->route('users.edit', $id)->with(['success' => 'Edit successfully!!!']);
+            }
         }
 
-        if ($user->update($request->all())) {
-            return redirect('admin/users/'.$id.'/edit')->with(['success' => 'Edit successfully!!!']);
-        }
+        abort(500, 'User not found!!!');
     }
 
     /**
@@ -146,10 +135,12 @@ class UsersController extends Controller
     public function destroy($id)
     {
         $user = User::find($id);
-        $user->delete();
+        if ($this->userService->deleteUser($user)) {
+            return response()->json([
+                'success' => 'Record has been deleted successfully!',
+            ]);
+        }
 
-        return response()->json([
-            'success' => 'Record has been deleted successfully!'
-        ]);
+        abort(500, 'Cannot delete');
     }
 }

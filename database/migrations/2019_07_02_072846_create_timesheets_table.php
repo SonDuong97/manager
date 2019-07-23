@@ -21,6 +21,7 @@ class CreateTimesheetsTable extends Migration
             $table->boolean('approved')->default(0)->comment('1:true; 0:false');
             $table->integer('user_id');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

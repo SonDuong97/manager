@@ -21,6 +21,7 @@ class CreateSummaryLogsTable extends Migration
             $table->date('to_date');
             $table->integer('user_id');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

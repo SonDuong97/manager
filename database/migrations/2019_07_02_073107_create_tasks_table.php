@@ -19,6 +19,7 @@ class CreateTasksTable extends Migration
             $table->integer('used_time');
             $table->integer('timesheet_id');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

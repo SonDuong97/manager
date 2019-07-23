@@ -1,9 +1,10 @@
 <?php
-
+Route::get('/', 'UsersController@showDashboard')->name('staff.top');
 Route::get('/dashboard', 'UsersController@showDashboard')->name('staff.dashboard');
+Route::get('/get-log', 'TimesheetsController@getLog')->name('staff.getLog');
 
 Route::resource('/timesheets', 'TimesheetsController')->except(['destroy']);
-Route::get('/show-timesheet-list', 'TimesheetsController@showTimesheetList');
+Route::get('/show-timesheet-list', 'TimesheetsController@showTimesheetList')->name('timesheets.showList');
 
 //Manager
 Route::get('/get-staff-list', 'ManagerController@getTimesheetList')->name('manager.get.timesheet');

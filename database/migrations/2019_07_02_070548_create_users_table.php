@@ -18,7 +18,7 @@ class CreateUsersTable extends Migration
             $table->string('username', 255);
             $table->string('password', 255);
             $table->string('email', 255);
-            $table->string('avatar', 255)->default(url('\images\default-avatar.jpg'));
+            $table->string('avatar', 255)->default('/staff-assets/dist/img/avatar.png');
             $table->text('description')->nullable();
             $table->boolean('notified')->default(0)->comment('cc; 1:true; 0:false');
             $table->integer('role_id');

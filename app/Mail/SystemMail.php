@@ -29,7 +29,7 @@ class SystemMail extends Mailable
      */
     public function __construct($action)
     {
-        $this->template = MailTemplate::where(MailTemplate::ACTION_COL, $action)
+        $this->template = MailTemplate::where(MailTemplate::COL_ACTION, $action)
                                     ->first();
     }
 

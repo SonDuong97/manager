@@ -26,7 +26,7 @@ class TimesheetsController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware(['auth']);
     }
 
     /**
@@ -36,7 +36,7 @@ class TimesheetsController extends Controller
      */
     public function index()
     {
-        $timesheets = Timesheet::where(Timesheet::USER_ID_COL, Auth::id());
+        $timesheets = Timesheet::where(Timesheet::COL_USER_ID, Auth::id());
 
         return DataTables::of($timesheets)
             ->make(true);
@@ -126,8 +126,8 @@ class TimesheetsController extends Controller
      */
     public function show($id)
     {
-        $timesheet = new TimesheetResource(Timesheet::where(Timesheet::ID_COL, $id)
-                                                    ->where(Timesheet::USER_ID_COL, Auth::id())
+        $timesheet = new TimesheetResource(Timesheet::where(Timesheet::COL_ID, $id)
+                                                    ->where(Timesheet::COL_USER_ID, Auth::id())
                                                     ->first());
 
         return view('staff.timesheets.show', ['timesheet' => $timesheet]);
@@ -141,8 +141,8 @@ class TimesheetsController extends Controller
      */
     public function edit($id)
     {
-        $timesheet = Timesheet::where(Timesheet::ID_COL, $id)
-                            ->where(Timesheet::USER_ID_COL, Auth::id())
+        $timesheet = Timesheet::where(Timesheet::COL_ID, $id)
+                            ->where(Timesheet::COL_USER_ID, Auth::id())
                             ->first();
         if ($timesheet) {
             $timesheet = new TimesheetResource($timesheet);
@@ -161,8 +161,8 @@ class TimesheetsController extends Controller
      */
     public function update(CreateTimesheetRequest $request, $id)
     {
-        $timesheet = Timesheet::where(Timesheet::ID_COL, $id)
-            ->where(Timesheet::USER_ID_COL, Auth::id())
+        $timesheet = Timesheet::where(Timesheet::COL_ID, $id)
+            ->where(Timesheet::COL_USER_ID, Auth::id())
             ->first();
         if ($timesheet) {
             if ($timesheet->approved == Timesheet::APPROVED) {
@@ -174,11 +174,12 @@ class TimesheetsController extends Controller
             }
 
             $timesheet->update([
+                'approved' => Timesheet::NOT_APPROVED,
                 'date' => date('Y-m-d', strtotime($request->input('date'))),
                 'trouble' => $request->input('trouble'),
                 'plan_of_next_day' => $request->input('plan'),
-                'approved' => Timesheet::NOT_APPROVED,
             ]);
+
             $tasks = $request->input('tasks');
             foreach ($tasks['contents'] as $key => $value) {
                 $task = Task::find($key);
@@ -220,8 +221,8 @@ class TimesheetsController extends Controller
     protected function isDelayed()
     {
         $timeNow = Carbon::now()->toTimeString();
-        $endTime = Setting::select(Setting::VALUE_COL)
-            ->where('name', Setting::END_TIMESHEET_COL)
+        $endTime = Setting::select(Setting::COL_VALUE)
+            ->where('name', Setting::COL_END_TIMESHEET)
             ->first()
             ->value;
         if ($timeNow > $endTime) {
@@ -229,5 +230,11 @@ class TimesheetsController extends Controller
         }
 
         return false;
+    }
+
+    public function getLog()
+    {
+        $logs = SummaryLog::where(SummaryLog::COL_USER_ID, Auth::id())->get();
+        return response()->json($logs);
     }
 }

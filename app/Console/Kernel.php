@@ -38,14 +38,14 @@ class Kernel extends ConsoleKernel
                 ->where(Role::COL_ROLE_NAME, Role::ROLE_STAFF)
                 ->first()
                 ->id;
-            $staffs = User::select('email')->where(User::COL_ROLE_ID, $idRoleStaff)->get();
+            $staffs = User::select(User::COL_EMAIL)->where(User::COL_ROLE_ID, $idRoleStaff)->get();
 
             foreach ($staffs as $staff) {
                 Mail::to($staff->email)
                     ->queue(new SystemMail(MailTemplate::ACTION_TIME_TO_CREATE_TIMESHEET));
             }
-        })->dailyAt(Setting::select(Setting::VALUE_COL)
-                            ->where(Setting::NAME_COL, Setting::START_TIMESHEET_COL)
+        })->dailyAt(Setting::select(Setting::COL_VALUE)
+                            ->where(Setting::COL_NAME, Setting::COL_START_TIMESHEET)
                             ->first()
                             ->value);
 
@@ -54,14 +54,14 @@ class Kernel extends ConsoleKernel
                 ->where(Role::COL_ROLE_NAME, Role::ROLE_STAFF)
                 ->first()
                 ->id;
-            $staffs = User::select('email')->where(User::COL_ROLE_ID, $idRoleStaff)->get();
+            $staffs = User::select(User::COL_EMAIL)->where(User::COL_ROLE_ID, $idRoleStaff)->get();
 
             foreach ($staffs as $staff) {
                 Mail::to($staff->email)
                     ->queue(new SystemMail(MailTemplate::ACTION_DEADLINE_TO_CREATE_TIMESHEET));
             }
-        })->dailyAt(Setting::select(Setting::VALUE_COL)
-            ->where(Setting::NAME_COL, Setting::END_TIMESHEET_COL)
+        })->dailyAt(Setting::select(Setting::COL_VALUE)
+            ->where(Setting::COL_NAME, Setting::COL_END_TIMESHEET)
             ->first()
             ->value);
     }

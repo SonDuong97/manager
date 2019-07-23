@@ -23,7 +23,7 @@ class ManagerController extends Controller
 
     public function getTimesheetList()
     {
-        $timesheets = Timesheet::whereIn(Timesheet::USER_ID_COL, function ($query) {
+        $timesheets = Timesheet::whereIn(Timesheet::COL_USER_ID, function ($query) {
             $query->select('id')
                 ->from('users')
                 ->where(User::COL_MANAGER_ID, Auth::id());
@@ -46,7 +46,7 @@ class ManagerController extends Controller
 
     public function showTimesheet($id)
     {
-        $timesheet = new TimesheetResource(Timesheet::where(Timesheet::ID_COL, $id)
+        $timesheet = new TimesheetResource(Timesheet::where(Timesheet::COL_ID, $id)
             ->first());
 
         return view('staff.timesheets.show', ['timesheet' => $timesheet]);

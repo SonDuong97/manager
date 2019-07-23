@@ -2,11 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Model as AppModel;
 
-class Task extends Model
+class Task extends AppModel
 {
     protected $table = 'tasks';
-    protected $fillable = ['content', 'used_time', 'timesheet_id'];
-    public $timestamps = true;
+    protected $fillable = [
+        'content',
+        'used_time',
+        'timesheet_id',
+        'created_at',
+        'modified_at',
+        'deleted_at',
+    ];
 }

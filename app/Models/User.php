@@ -20,7 +20,17 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'username', 'email', 'password', 'role_id', 'manager_id',
+        'username',
+        'email',
+        'password',
+        'role_id',
+        'manager_id',
+        'avatar',
+        'description',
+        'notified',
+        'created_at',
+        'modified_at',
+        'deleted_at',
     ];
 
     /**
@@ -59,8 +69,13 @@ class User extends Authenticatable
         'deleted_at'
     ];
 
-    public const COL_ROLE_ID = 'role_id';
-    public const COL_MANAGER_ID = 'manager_id';
+    /**
+     * List of column
+     * @var string
+     */
+    const COL_ROLE_ID = 'role_id';
+    const COL_MANAGER_ID = 'manager_id';
+    const COL_EMAIL = 'email';
 
     public function manager()
     {
