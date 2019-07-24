@@ -5,20 +5,25 @@ namespace App\Http\Controllers\Staff;
 use App\Http\Resources\Staff\TimesheetResource;
 use App\Models\Timesheet;
 use App\Models\User;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Staff\Controller as StaffController;
+use App\Services\Interfaces\DatatableServiceInterface;
+use App\Services\Interfaces\TimesheetServiceInterface;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
 
-class ManagerController extends Controller
+class ManagerController extends StaffController
 {
-
+    protected $datatableService;
+    protected $timesheetService;
     /**
      * ManagerController constructor.
      */
-    public function __construct()
+    public function __construct(DatatableServiceInterface $datatableService, TimesheetServiceInterface $timesheetService)
     {
-        $this->middleware(['auth', 'check.manager.role']);
+        parent::__construct();
+        $this->middleware('pass_if_role_is_manager');
+        $this->datatableService = $datatableService;
+        $this->timesheetService = $timesheetService;
     }
 
     public function getTimesheetList()
@@ -28,18 +33,11 @@ class ManagerController extends Controller
                 ->from('users')
                 ->where(User::COL_MANAGER_ID, Auth::id());
         })->where(Timesheet::COL_APPROVED, Timesheet::NOT_APPROVED);
-        return DataTables::of($timesheets)
-            ->addColumn('username', function ($timesheet) {
-                if ($timesheet->user) {
-                    return $timesheet->user->username;
-                } else {
-                    return 'N/A';
-                }
-            })
-            ->make(true);
+
+        return $this->datatableService->timesheets($timesheets);
     }
 
-    public function showStaffList()
+    public function indexTimesheet()
     {
         return view('manager.approve');
     }
@@ -54,8 +52,15 @@ class ManagerController extends Controller
 
     public function approveTimesheet($id)
     {
-        $timesheet = Timesheet::where(Timesheet::ID_COL, $id)
-            ->update([Timesheet::COL_APPROVED => Timesheet::APPROVED]);
-        return $timesheet;
+        $timesheet = Timesheet::find($id);
+        $managerId = $timesheet->user->manager->id;
+
+        if ($managerId == Auth::id()) {
+            if ($this->timesheetService->approveTimesheet($timesheet)) {
+                return 204;
+            }
+        }
+
+        abort(403, "Forbidden!!!");
     }
 }

@@ -14,6 +14,7 @@ class AppServiceProvider extends ServiceProvider
         Interfaces\TimesheetServiceInterface::class => Services\TimesheetService::class,
         Interfaces\UserServiceInterface::class => Services\UserService::class,
         Interfaces\RoleServiceInterface::class => Services\RoleService::class,
+        Interfaces\DatatableServiceInterface::class => Services\DatatableService::class,
     ];
     /**
      * Register any application services.

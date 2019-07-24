@@ -7,7 +7,7 @@ use App\Http\Requests\Admin\TimeTimesheetRequest;
 use App\Models\Setting;
 use App\Services\Interfaces\SettingServiceInterface;
 
-class SettingTimesheetsController extends AdminController
+class SettingTimesheetController extends AdminController
 {
     protected $settingService;
     /**

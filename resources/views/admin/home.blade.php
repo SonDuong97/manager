@@ -36,7 +36,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{route('users.index')}}',
+                    url: '{{route('users.get_all')}}',
                 },
                 columns: [
                     { data: 'id', name: 'users.id' },

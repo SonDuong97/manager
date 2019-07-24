@@ -39,7 +39,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: '{{route('timesheets.index')}}',
+                    url: '{{route('timesheets.get_all')}}',
                 },
                 columns: [
                     { data: 'id', name: 'timesheets.id' },
@@ -51,7 +51,7 @@
                         data: 'id',
                         render: function (data, type, row, meta) {
                             var command = '';
-                            command += '<a href="/staff/timesheets/'+data+'" class="btn btn-primary margin-r-5"><i class="fa fa-info-circle"></i></a>';;
+                            command += '<a href="/staff/timesheets/'+data+'" class="btn btn-primary margin-r-5"><i class="fa fa-info-circle"></i></a>';
                             command += '<a href="/staff/timesheets/'+data+'/edit" class="btn btn-warning margin-r-5"><i class="fa fa-edit"></i></a>';
                             return command;
                         }

@@ -61,7 +61,8 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'check.role' => \App\Http\Middleware\AfterLoginCheckRole::class,
-        'check.manager.role' => \App\Http\Middleware\CheckManagerRole::class,
+        'pass_if_role_is_manager' => \App\Http\Middleware\PassIfRoleIsManager::class,
+        'pass_except_admin_role' => \App\Http\Middleware\PassExceptAdminRole::class,
     ];
 
     /**

@@ -6,7 +6,7 @@ use App\Models\Role;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
-class AfterLoginCheckRole
+class PassExceptAdminRole
 {
     /**
      * Handle an incoming request.
@@ -17,18 +17,11 @@ class AfterLoginCheckRole
      */
     public function handle($request, Closure $next)
     {
-        $response = $next($request);
+        if (Auth::check())
+            if (Auth::user()->role->role_name != Role::ROLE_ADMIN) {
+                return $next($request);
+            }
 
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
-
-        if (Auth::user()->role->role_name == Role::ROLE_ADMIN) {
-            return $response;
-        } else {
-            return redirect()->route('staffs.dashboard');
-        }
-
-
+        return redirect()->route('login');
     }
 }

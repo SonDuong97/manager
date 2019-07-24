@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Role;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,10 +19,10 @@ class RedirectIfAuthenticated
     public function handle($request, Closure $next, $guard = null)
     {
         if (Auth::check()) {
-            if (Auth::user()->role->role_name == 'admin') {
+            if (Auth::user()->role->role_name == Role::ROLE_ADMIN) {
                 return redirect()->route('admin.top');
             } else {
-                return redirect()->route('staff.dashboard');
+                return redirect()->route('staffs.dashboard');
             }
         }
 //        switch ($guard)
@@ -34,7 +35,7 @@ class RedirectIfAuthenticated
 //            case 'staff':
 //            default:
 //                if (Auth::guard($guard)->check()) {
-//                    return redirect()->route('staff.top');
+//                    return redirect()->route('staffs.top');
 //                }
 //            break;
 //        }

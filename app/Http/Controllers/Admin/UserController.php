@@ -3,29 +3,32 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\Admin\EditUserRequest;
-use App\Http\Resources\Admin\RoleResource;
-use App\Http\Resources\Admin\UserResource;
+use App\Services\Interfaces\DatatableServiceInterface;
 use App\Services\Interfaces\RoleServiceInterface;
 use App\Services\Interfaces\UserServiceInterface;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\Controller as AdminController;
 use App\Models\User;
 use App\Models\Role;
-use Yajra\DataTables\DataTables;
 use App\Http\Requests\Admin\CreateUserRequest;
 
-class UsersController extends AdminController
+class UserController extends AdminController
 {
     protected $userService;
     protected $roleService;
+    protected $datatableService;
     /**
      * UsersController constructor.
      */
-    public function __construct(UserServiceInterface $userService, RoleServiceInterface $roleService)
+    public function __construct(
+        UserServiceInterface $userService,
+        RoleServiceInterface $roleService,
+        DatatableServiceInterface $datatableService
+    )
     {
         parent::__construct();
         $this->userService = $userService;
         $this->roleService = $roleService;
+        $this->datatableService = $datatableService;
     }
 
     /**
@@ -35,29 +38,7 @@ class UsersController extends AdminController
      */
     public function index()
     {
-        $users = User::select([
-            'id',
-            'username',
-            'email',
-            'role_id',
-            'manager_id',
-        ]);
-        return DataTables::of($users)
-            ->addColumn('manager', function($user) {
-                if (isset($user->manager)) {
-                    return $user->manager->username;
-                } else {
-                    return 'N/A';
-                }
-            })
-            ->addColumn('role', function ($user) {
-                if (isset($user->role)) {
-                    return $user->role->role_name;
-                } else {
-                    return 'N/A';
-                }
-            })
-            ->make(true);
+        return view('admin.home');
     }
 
     /**
@@ -142,5 +123,10 @@ class UsersController extends AdminController
         }
 
         abort(500, 'Cannot delete');
+    }
+
+    public function getUsers()
+    {
+        return $this->datatableService->users();
     }
 }

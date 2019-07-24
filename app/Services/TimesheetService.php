@@ -9,6 +9,7 @@ use App\Models\Setting;
 use App\Models\SummaryLog;
 use App\Models\Task;
 use App\Models\Timesheet;
+use App\Models\User;
 use App\Services\Interfaces\TimesheetServiceInterface;
 use App\Services\Service as BaseService;
 use Carbon\Carbon;
@@ -40,8 +41,9 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
 
             //Summary logs
             $now = Carbon::now();
-            $summary = SummaryLog::where('from_date', '<=', $now->toDateString())
-                ->where('to_date', '>=', $now->toDateString())
+            $summary = SummaryLog::where(SummaryLog::COL_FROM_DATE, '<=', $now->toDateString())
+                ->where(SummaryLog::COL_TO_DATE, '>=', $now->toDateString())
+                ->where(SummaryLog::COL_USER_ID, $user->id)
                 ->first();
             if ($summary) {
                 $registed_time = $summary->registed_time + 1;
@@ -68,8 +70,8 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
                 ]);
             }
             // Send mail to manager
-            $emailManager = $user->manager->email;
-            if ($emailManager) {
+            if ($user->manager) {
+                $emailManager = $user->manager->email;
                 Mail::to($emailManager)
                     ->queue(new SystemMail(MailTemplate::ACTION_STAFF_CREATED_TIMESHEET));
             }
@@ -121,7 +123,7 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
     public function approveTimesheet(Timesheet $timesheet)
     {
         return $timesheet->update([
-            'approved' => Timesheet::APPROVED,
+            Timesheet::COL_APPROVED => Timesheet::APPROVED,
         ]);
     }
 

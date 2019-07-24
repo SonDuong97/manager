@@ -28,7 +28,7 @@
         <ul class="sidebar-menu" data-widget="tree">
             <li class="header">MAIN NAVIGATION</li>
             <li class="active  menu-open">
-                <a href="{{route('staff.dashboard')}}">
+                <a href="{{route('staffs.dashboard')}}">
                     <i class="fa fa-dashboard"></i> <span>Dashboard</span>
                 </a>
             </li>
@@ -104,7 +104,7 @@
 
             @if (Auth::user()->role->role_name == 'manager')
             <li>
-                <a href="{{route('manager.show.staff')}}">
+                <a href="{{route('manager.index.timesheet')}}">
                     <i class="fa fa-edit"></i> <span>Approve Timesheet</span>
 {{--                    <span class="pull-right-container">--}}
 {{--              <i class="fa fa-angle-left pull-right"></i>--}}
@@ -117,7 +117,7 @@
             </li>
             @endif
             <li>
-                <a href="{{route('timesheets.showList')}}">
+                <a href="{{route('timesheets.index')}}">
                     <i class="fa fa-calendar"></i> <span>Timesheet</span>
 {{--                    <span class="pull-right-container">--}}
 {{--              <small class="label pull-right bg-red">3</small>--}}

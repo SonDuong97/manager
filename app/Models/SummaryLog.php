@@ -23,4 +23,6 @@ class SummaryLog extends AppModel
      * @var string
      */
     const COL_USER_ID = 'user_id';
+    const COL_FROM_DATE = 'from_date';
+    const COL_TO_DATE = 'to_date';
 }

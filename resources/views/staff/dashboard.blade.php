@@ -14,7 +14,7 @@
                 <small>Version 2.0</small>
             </h1>
             <ol class="breadcrumb">
-                <li><a href="{{route('staff.dashboard')}}"><i class="fa fa-dashboard"></i> Home</a></li>
+                <li><a href="{{route('staffs.dashboard')}}"><i class="fa fa-dashboard"></i> Home</a></li>
                 <li class="active">Dashboard</li>
             </ol>
         </section>
@@ -69,36 +69,46 @@
 
 @section('js')
     <script>
+        function isEmpty(obj) {
+            for(var key in obj) {
+                if(obj.hasOwnProperty(key))
+                    return false;
+            }
+            return true;
+        }
+
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             dataType : 'json',
-            url: '{{route('staff.getLog')}}',
+            url: '{{route('staffs.getLog')}}',
             type: 'get',
             success: function(result){
                 var chart = '';
-                result.forEach(function (item) {
-                    chart += '<div class="text-blue"><strong>From: '+ item.from_date +'</strong></div>\n' +
-                        '                            <div class="text-blue"><strong>To: '+ item.to_date +'</strong></div>';
-                    var percentageOfDelayedTimesheet = Math.round(item.delayed_time/item.registed_time * 100);
-                    var percentageOfRegistedTimesheetOnTime  = 100 - percentageOfDelayedTimesheet;
+                if (!isEmpty(result)) {
+                    result.forEach(function (item) {
+                        chart += '<div class="text-blue"><strong>From: '+ item.from_date +'</strong></div>\n' +
+                            '                            <div class="text-blue"><strong>To: '+ item.to_date +'</strong></div>';
+                        var percentageOfDelayedTimesheet = Math.round(item.delayed_time/item.registed_time * 100);
+                        var percentageOfRegistedTimesheetOnTime  = 100 - percentageOfDelayedTimesheet;
 
-                    chart += '<h5>\n' +
-                        '        Registed Timesheet On Time Rating\n' +
-                        '        <small class="label label-success pull-right">'+ percentageOfRegistedTimesheetOnTime +'%</small>\n' +
-                        '    </h5>\n' +
-                        '    <div class="progress progress-xxs">\n' +
-                        '        <div class="progress-bar progress-bar-success" style="width: '+ percentageOfRegistedTimesheetOnTime +'%"></div>\n' +
-                        '    </div>';
-                    chart += '<h5>\n' +
-                        '        Delayed Timesheet Rating\n' +
-                        '        <small class="label label-danger pull-right">'+ percentageOfDelayedTimesheet +'%</small>\n' +
-                        '    </h5>\n' +
-                        '    <div class="progress progress-xxs">\n' +
-                        '        <div class="progress-bar progress-bar-danger" style="width: '+ percentageOfDelayedTimesheet +'%"></div>\n' +
-                        '    </div>';
-                });
+                        chart += '<h5>\n' +
+                            '        Registed Timesheet On Time Rating\n' +
+                            '        <small class="label label-success pull-right">'+ percentageOfRegistedTimesheetOnTime +'%</small>\n' +
+                            '    </h5>\n' +
+                            '    <div class="progress progress-xxs">\n' +
+                            '        <div class="progress-bar progress-bar-success" style="width: '+ percentageOfRegistedTimesheetOnTime +'%"></div>\n' +
+                            '    </div>';
+                        chart += '<h5>\n' +
+                            '        Delayed Timesheet Rating\n' +
+                            '        <small class="label label-danger pull-right">'+ percentageOfDelayedTimesheet +'%</small>\n' +
+                            '    </h5>\n' +
+                            '    <div class="progress progress-xxs">\n' +
+                            '        <div class="progress-bar progress-bar-danger" style="width: '+ percentageOfDelayedTimesheet +'%"></div>\n' +
+                            '    </div>';
+                    });
+                }
                 $('#divChart').html(chart);
             },
             error: function () {
