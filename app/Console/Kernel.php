@@ -45,7 +45,7 @@ class Kernel extends ConsoleKernel
                     ->queue(new SystemMail(MailTemplate::ACTION_TIME_TO_CREATE_TIMESHEET));
             }
         })->dailyAt(Setting::select(Setting::COL_VALUE)
-                            ->where(Setting::COL_NAME, Setting::COL_START_TIMESHEET)
+                            ->where(Setting::COL_NAME, Setting::COL_NAME_START_TIMESHEET)
                             ->first()
                             ->value);
 
@@ -61,7 +61,7 @@ class Kernel extends ConsoleKernel
                     ->queue(new SystemMail(MailTemplate::ACTION_DEADLINE_TO_CREATE_TIMESHEET));
             }
         })->dailyAt(Setting::select(Setting::COL_VALUE)
-            ->where(Setting::COL_NAME, Setting::COL_END_TIMESHEET)
+            ->where(Setting::COL_NAME, Setting::COL_NAME_END_TIMESHEET)
             ->first()
             ->value);
     }

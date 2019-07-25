@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Staff;
 
 use App\Http\Requests\Timesheet\CreateTimesheetRequest;
 use App\Http\Resources\Staff\TimesheetResource;
-use App\Models\Timesheet;
 use App\Services\Interfaces\DatatableServiceInterface;
 use App\Services\Interfaces\TimesheetServiceInterface;
 use App\Http\Controllers\Staff\Controller as StaffController;
@@ -69,9 +68,8 @@ class TimesheetController extends StaffController
      */
     public function show($id)
     {
-        $timesheet = new TimesheetResource(Timesheet::where(Timesheet::COL_ID, $id)
-                                                    ->where(Timesheet::COL_USER_ID, Auth::id())
-                                                    ->first());
+        $timesheet = $this->timesheetService->getTimesheetByIdAndUserId($id, Auth::id())->first();
+
         if ($timesheet) {
             return view('staff.timesheets.show', compact('timesheet'));
         }
@@ -87,9 +85,7 @@ class TimesheetController extends StaffController
      */
     public function edit($id)
     {
-        $timesheet = Timesheet::where(Timesheet::COL_ID, $id)
-                            ->where(Timesheet::COL_USER_ID, Auth::id())
-                            ->first();
+        $timesheet = $timesheet = $this->timesheetService->getTimesheetByIdAndUserId($id, Auth::id())->first();
         if ($timesheet) {
             $timesheet = new TimesheetResource($timesheet);
 
@@ -107,9 +103,7 @@ class TimesheetController extends StaffController
      */
     public function update(CreateTimesheetRequest $request, $id)
     {
-        $timesheet = Timesheet::where(Timesheet::COL_ID, $id)
-            ->where(Timesheet::COL_USER_ID, Auth::id())
-            ->first();
+        $timesheet = $timesheet = $this->timesheetService->getTimesheetByIdAndUserId($id, Auth::id())->first();
         if ($this->timesheetService->updateTimesheet($timesheet, $request)) {
             return redirect()->route('timesheets.edit', $id)->with(['success' => 'Edit successfully']);
         }
@@ -119,7 +113,8 @@ class TimesheetController extends StaffController
 
     public function getTimesheets()
     {
-        $timesheets = Timesheet::where(Timesheet::COL_USER_ID, Auth::id());
+        $timesheets = $this->timesheetService->getTimesheetByUserId(Auth::id());
+
         return $this->datatableService->timesheets($timesheets);
     }
 }

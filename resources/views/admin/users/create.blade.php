@@ -67,24 +67,24 @@
         </div>
 
         <div class="form-group">
-            <label for="inputManager" class="col-sm-2 control-label">Manger</label>
-            <div class="col-sm-10">
-                <select name="manager" id="inputManager" class="form-control">
-                    <option value=""> -- Select One -- </option>
-                    @foreach($managers as $manager)
-                        <option value="{{$manager->id}}">{{$manager->username}}</option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
-
-        <div class="form-group">
             <label for="inputRole" class="col-sm-2 control-label">Role</label>
             <div class="col-sm-10">
                 <select name="role" id="inputRole" class="form-control">
                     <option value=""> -- Select One -- </option>
                     @foreach($roles as $role)
                         <option value="{{$role->id}}">{{$role->role_name}}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inputManager" class="col-sm-2 control-label">Manger</label>
+            <div class="col-sm-10">
+                <select name="manager" id="inputManager" class="form-control">
+                    <option value=""> -- Select One -- </option>
+                    @foreach($managers as $manager)
+                        <option value="{{$manager->id}}">{{$manager->username}}</option>
                     @endforeach
                 </select>
             </div>

@@ -13,12 +13,24 @@ use App\Models\User;
 use App\Services\Interfaces\TimesheetServiceInterface;
 use App\Services\Service as BaseService;
 use Carbon\Carbon;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
+/**
+ * Class TimesheetService
+ * @package App\Services
+ */
 class TimesheetService extends BaseService implements TimesheetServiceInterface
 {
+    /**
+     * Create timesheet and send mail notification to manager and person who is received notification.
+     *
+     * @param User $user
+     * @param Request $request
+     * @return mixed
+     */
     public function createTimesheet(User $user, Request $request)
     {
         return DB::transaction(function () use ($user, $request) {
@@ -76,10 +88,25 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
                     ->queue(new SystemMail(MailTemplate::ACTION_STAFF_CREATED_TIMESHEET));
             }
 
+            // Send mail to people who are notified notication.
+            $receivedPeople = User::select(User::COL_EMAIL)->where(User::COL_NOTIFIED, User::TYPE_NOTIFIED)->get();
+            if (count($receivedPeople) > 0) {
+                foreach ($receivedPeople as $person) {
+                    Mail::to($person->email)
+                        ->queue(new SystemMail(MailTemplate::ACTION_STAFF_CREATED_TIMESHEET));
+                }
+            }
             return $timesheet;
         }, 3);
     }
 
+    /**
+     * Update timesheet and send mail notification to manager.
+     *
+     * @param Timesheet $timesheet
+     * @param Request $request
+     * @return mixed
+     */
     public function updateTimesheet(Timesheet $timesheet, Request $request)
     {
         return DB::transaction(function () use ($timesheet, $request) {
@@ -120,6 +147,12 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
         }, 3);
     }
 
+    /**
+     * Update approved attribute become approved
+     *
+     * @param Timesheet $timesheet
+     * @return bool
+     */
     public function approveTimesheet(Timesheet $timesheet)
     {
         return $timesheet->update([
@@ -127,11 +160,16 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
         ]);
     }
 
+    /**
+     * Check sending time is delayed or not.
+     *
+     * @return bool
+     */
     public function isDelayed()
     {
         $timeNow = Carbon::now()->toTimeString();
         $endTime = Setting::select(Setting::COL_VALUE)
-            ->where(Setting::COL_NAME, Setting::COL_END_TIMESHEET)
+            ->where(Setting::COL_NAME, Setting::COL_NAME_END_TIMESHEET)
             ->first()
             ->value;
         if ($timeNow > $endTime) {
@@ -139,5 +177,54 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
         }
 
         return false;
+    }
+
+    /**
+     * Get timesheets haven't been approved with user_id is is managed by a manager.
+     *
+     * @param $managerID
+     * @return Builder
+     */
+    public function getTimesheetsNotApproved($managerID)
+    {
+        $timesheets = Timesheet::whereIn(Timesheet::COL_USER_ID, function ($query) use ($managerID) {
+            $query->select(User::COL_ID)
+                ->from('users')
+                ->where(User::COL_MANAGER_ID, $managerID);
+        })->where(Timesheet::COL_APPROVED, Timesheet::NOT_APPROVED);
+
+        return $timesheets;
+    }
+
+    /**
+     * Get timesheet by ID.
+     *
+     * @param $id
+     * @return Builder
+     */
+    public function getTimesheetByID($id)
+    {
+        $timesheet = Timesheet::with('user')->where(Timesheet::COL_ID, $id);
+
+        return $timesheet;
+    }
+
+    public function getTimesheetByUserId($userId)
+    {
+        $timesheets = Timesheet::where(Timesheet::COL_USER_ID, $userId);
+
+        return $timesheets;
+    }
+
+    /**
+     * Get timsheet by id and userId
+     *
+     * @param $id
+     * @param $userId
+     * @return Builder
+     */
+    public function getTimesheetByIdAndUserId($id, $userId)
+    {
+        return $this->getTimesheetByID($id)->union($this->getTimesheetByUserId($userId));
     }
 }

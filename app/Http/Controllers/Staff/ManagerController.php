@@ -2,19 +2,17 @@
 
 namespace App\Http\Controllers\Staff;
 
-use App\Http\Resources\Staff\TimesheetResource;
 use App\Models\Timesheet;
-use App\Models\User;
 use App\Http\Controllers\Staff\Controller as StaffController;
 use App\Services\Interfaces\DatatableServiceInterface;
 use App\Services\Interfaces\TimesheetServiceInterface;
 use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\DataTables;
 
 class ManagerController extends StaffController
 {
     protected $datatableService;
     protected $timesheetService;
+
     /**
      * ManagerController constructor.
      */
@@ -28,11 +26,7 @@ class ManagerController extends StaffController
 
     public function getTimesheetList()
     {
-        $timesheets = Timesheet::whereIn(Timesheet::COL_USER_ID, function ($query) {
-            $query->select('id')
-                ->from('users')
-                ->where(User::COL_MANAGER_ID, Auth::id());
-        })->where(Timesheet::COL_APPROVED, Timesheet::NOT_APPROVED);
+        $timesheets = $this->timesheetService->getTimesheetsNotApproved(Auth::id());
 
         return $this->datatableService->timesheets($timesheets);
     }
@@ -44,18 +38,17 @@ class ManagerController extends StaffController
 
     public function showTimesheet($id)
     {
-        $timesheet = new TimesheetResource(Timesheet::where(Timesheet::COL_ID, $id)
-            ->first());
+        $timesheet = $this->timesheetService->getTimesheetByID($id)->first();
 
-        return view('staff.timesheets.show', ['timesheet' => $timesheet]);
+        return view('staff.timesheets.show', compact('timesheet'));
     }
 
     public function approveTimesheet($id)
     {
         $timesheet = Timesheet::find($id);
-        $managerId = $timesheet->user->manager->id;
+        $managerID = $timesheet->user->manager->id;
 
-        if ($managerId == Auth::id()) {
+        if ($managerID == Auth::id()) {
             if ($this->timesheetService->approveTimesheet($timesheet)) {
                 return 204;
             }

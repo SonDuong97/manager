@@ -15,6 +15,7 @@ class AppServiceProvider extends ServiceProvider
         Interfaces\UserServiceInterface::class => Services\UserService::class,
         Interfaces\RoleServiceInterface::class => Services\RoleService::class,
         Interfaces\DatatableServiceInterface::class => Services\DatatableService::class,
+        Interfaces\SummayLogServiceInterface::class => Services\SummaryLogService::class,
     ];
     /**
      * Register any application services.

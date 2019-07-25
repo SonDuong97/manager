@@ -44,9 +44,13 @@ class CreateUserRequest extends FormRequest
             ],
 //            'avatar' => 'file',
             'description' => 'max:10000',
-            'manager' => Rule::exists('roles', 'id')->where(function ($query) {
-               $query->where('role_name', 'leader');
-            }),
+            'manager' => [
+                'sometimes',
+                'nullable',
+                Rule::exists('roles', 'id')->where(function ($query) {
+                    $query->where('role_name', 'leader');
+                }),
+            ],
             'role' => Rule::exists('roles', 'id')->where(function ($query) {
                 $query->where('role_name', '!=', 'admin');
             }),

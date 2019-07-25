@@ -76,6 +76,10 @@ class User extends Authenticatable
     const COL_ROLE_ID = 'role_id';
     const COL_MANAGER_ID = 'manager_id';
     const COL_EMAIL = 'email';
+    const COL_ID = 'id';
+    const COL_NOTIFIED = 'notified';
+    const TYPE_NOTIFIED = 1;
+    const TYPE_NOT_NOTIFED = 0;
 
     public function manager()
     {

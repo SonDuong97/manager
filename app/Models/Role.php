@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Model as AppModel;
+use Illuminate\Database\Eloquent\Collection;
 
 class Role extends AppModel
 {
@@ -30,5 +31,20 @@ class Role extends AppModel
 
     public function user() {
         return $this->hasMany('App\Models\User');
+    }
+
+    /**
+     * Get roles except admin
+     *
+     * @return Collection
+     */
+    public static function getRolesExceptAdminRole()
+    {
+        return Role::where(self::COL_ROLE_NAME, '!=', self::ROLE_ADMIN)->get();
+    }
+
+    public static function getRoleByName($roleName)
+    {
+        return Role::with('user')->where(Role::COL_ROLE_NAME, $roleName)->first()->user;
     }
 }

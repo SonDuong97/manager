@@ -21,8 +21,8 @@ class SettingTimesheetController extends AdminController
 
     public function edit()
     {
-        $startTimesheet = Setting::where(Setting::COL_NAME, Setting::COL_START_TIMESHEET)->first();
-        $endTimesheet = Setting::where(Setting::COL_NAME, Setting::COL_END_TIMESHEET)->first();
+        $startTimesheet = $this->settingService->getSettingByName(Setting::COL_NAME_START_TIMESHEET);
+        $endTimesheet = $this->settingService->getSettingByName(Setting::COL_NAME_END_TIMESHEET);
         return view(
             'admin.settings.timesheets.edit',
             [
@@ -34,8 +34,8 @@ class SettingTimesheetController extends AdminController
 
     public function update(TimeTimesheetRequest $request)
     {
-        $startTimesheet = Setting::where(Setting::COL_NAME, Setting::COL_START_TIMESHEET)->first();
-        $endTimesheet = Setting::where(Setting::COL_NAME, Setting::COL_END_TIMESHEET)->first();
+        $startTimesheet = $this->settingService->getSettingByName(Setting::COL_NAME_START_TIMESHEET);
+        $endTimesheet = $this->settingService->getSettingByName(Setting::COL_NAME_END_TIMESHEET);
 
         if ($this->settingService->updateSettingTimeTimesheet($startTimesheet, $endTimesheet, $request)) {
             return redirect()->route('settings.timesheets.edit')->with(['success' => 'Edit successfully!!!']);

@@ -48,8 +48,8 @@ class UserController extends AdminController
      */
     public function create()
     {
-        $roles = Role::where(Role::COL_ROLE_NAME, '!=', Role::ROLE_ADMIN)->get();
-        $managers = Role::where(Role::COL_ROLE_NAME, Role::ROLE_MANAGER)->first()->user;
+        $roles = $this->roleService->getRoleListExceptAdminRole();
+        $managers = $this->userService->getUserByRoleName(Role::ROLE_MANAGER);
 
         return view('admin.users.create', compact('roles', 'managers'));
     }

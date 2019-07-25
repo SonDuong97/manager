@@ -3,6 +3,7 @@
 
 namespace App\Services;
 
+use App\Models\Role;
 use App\Models\User;
 use App\Services\Interfaces\UserServiceInterface;
 use App\Services\Service as BaseService;
@@ -36,5 +37,10 @@ class UserService extends BaseService implements UserServiceInterface
     public function deleteUser(User $user)
     {
         return $user->delete();
+    }
+
+    public function getUserByRoleName($roleName)
+    {
+        return Role::with('user')->where(Role::COL_ROLE_NAME, $roleName)->first()->user;
     }
 }
