@@ -13,11 +13,17 @@ class UserService extends BaseService implements UserServiceInterface
 {
     public function createUser(Request $request)
     {
+        $avatarFileName = "";
+        if($request->hasFile('avatar')) {
+            $avatarFileName .= time().'.'.$request->avatar->getClientOriginalExtension();
+            $request->avatar->move(public_path('staff-assets/dist/img/'), $avatarFileName);
+        }
+
         return User::create([
                 'username' => $request->input('username'),
                 'password' => $request->input('password'),
                 'email' => $request->input('email'),
-                'avatar' => $request->input('avatar'),
+                'avatar' => $avatarFileName == ""?:'/staff-assets/dist/img/'.$avatarFileName,
                 'description' => $request->input('description'),
                 'role_id' => $request->input('role'),
                 'manager_id' => $request->input('manager'),

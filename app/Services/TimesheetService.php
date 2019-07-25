@@ -209,7 +209,12 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
         return $timesheet;
     }
 
-    public function getTimesheetByUserId($userId)
+    /**
+     * Get timesheet by userId.
+     * @param $userId
+     * @return Builder
+     */
+    public function getTimesheetsByUserId($userId)
     {
         $timesheets = Timesheet::where(Timesheet::COL_USER_ID, $userId);
 
@@ -217,7 +222,7 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
     }
 
     /**
-     * Get timsheet by id and userId
+     * Get timsheet by id and userId.
      *
      * @param $id
      * @param $userId
@@ -225,6 +230,19 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
      */
     public function getTimesheetByIdAndUserId($id, $userId)
     {
-        return $this->getTimesheetByID($id)->union($this->getTimesheetByUserId($userId));
+        return $this->getTimesheetByID($id)->union($this->getTimesheetsByUserId($userId));
+    }
+
+    /**
+     * Get timesheet by userId group by week.
+     *
+     * @param $userId
+     * @return Builder
+     */
+    public function getTimesheetsByUserIdGroupByWeek($userId)
+    {
+        return $this->getTimesheetsByUserId($userId)->groupBy(function ($date) {
+            return Carbon::parse($date->created_at)->format('W');
+        });
     }
 }

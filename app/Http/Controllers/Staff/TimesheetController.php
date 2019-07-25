@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Staff;
 
 use App\Http\Requests\Timesheet\CreateTimesheetRequest;
 use App\Http\Resources\Staff\TimesheetResource;
+use App\Models\Timesheet;
 use App\Services\Interfaces\DatatableServiceInterface;
 use App\Services\Interfaces\TimesheetServiceInterface;
 use App\Http\Controllers\Staff\Controller as StaffController;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class TimesheetController extends StaffController
 {
@@ -113,8 +115,18 @@ class TimesheetController extends StaffController
 
     public function getTimesheets()
     {
-        $timesheets = $this->timesheetService->getTimesheetByUserId(Auth::id());
+        $timesheets = $this->timesheetService->getTimesheetsByUserId(Auth::id());
 
         return $this->datatableService->timesheets($timesheets);
+    }
+
+    public function getTimesheetsGroupByWeek()
+    {
+        $timesheets = $this->timesheetService->getTimesheetsByUserIdGroupByWeek(Auth::id());
+//        $timesheets = Timesheet::selectRaw('count(*) AS cnt, created_at')->where(Timesheet::COL_USER_ID, 3)->groupBy(function ($date) {
+//            return Carbon::parse($date->created_at)->format('W');
+//        })->orderBy('cnt', 'DESC')->limit(5)->get();
+//        dd($timesheets);
+//        return $this->datatableService->timesheets($timesheets);
     }
 }

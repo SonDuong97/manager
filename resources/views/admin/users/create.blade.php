@@ -7,7 +7,7 @@
 @stop
 
 @section('content')
-    <form action="{{route('users.store')}}" method="post" role="form">
+    <form action="{{route('users.store')}}" method="post" role="form" enctype="multipart/form-data">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <legend>User form</legend>
         @if($errors->any())

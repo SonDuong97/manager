@@ -5,7 +5,7 @@ Route::get('/get-log', 'SummaryController@getLog')->name('staffs.getLog');
 
 Route::resource('/timesheets', 'TimesheetController')->except(['destroy']);
 Route::get('/get-timesheets', 'TimesheetController@getTimesheets')->name('timesheets.get_all');
-
+Route::get('/week', 'TimesheetController@getTimesheetsGroupByWeek');
 //Manager
 Route::get('/get-staff-list', 'ManagerController@getTimesheetList')->name('manager.get.timesheet');
 Route::get('/index-timesheet', 'ManagerController@indexTimesheet')->name('manager.index.timesheet');
