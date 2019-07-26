@@ -6,6 +6,15 @@
 
 @section('content')
     <div class="content-wrapper">
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                @foreach($errors->all() as $error)
+                    <strong>{{$error}}</strong>
+                    <br>
+                @endforeach
+            </div>
+        @endif
         <section class="content-header">
             <h1>Timesheet</h1>
         </section>
@@ -38,6 +47,8 @@
             $('#listTimesheets').DataTable({
                 processing: true,
                 serverSide: true,
+                searching: false,
+                lengthChange: false,
                 ajax: {
                     url: '{{route('timesheets.get_all')}}',
                 },

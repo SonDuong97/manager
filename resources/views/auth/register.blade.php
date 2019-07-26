@@ -15,10 +15,16 @@
 
         <div class="register-box-body">
             <p class="login-box-msg">{{ trans('adminlte::adminlte.register_message') }}</p>
-            <form action="{{ url(config('adminlte.register_url', 'register')) }}" method="post">
+            @if(session('success'))
+            <div class="alert alert-success">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <strong>{{ session('success') }}</strong>
+            </div>
+            @endif
+            <form action="{{ route('users.register') }}" method="post" role="form" enctype="multipart/form-data">
                 {!! csrf_field() !!}
 
-                <div class="form-group has-feedback {{ $errors->has('name') ? 'has-error' : '' }}">
+                <div class="form-group has-feedback {{ $errors->has('username') ? 'has-error' : '' }}">
 {{--                    <input type="text" name="name" class="form-control" value="{{ old('name') }}"--}}
 {{--                           placeholder="{{ trans('adminlte::adminlte.full_name') }}">--}}
                     <input type="text" name="username" class="form-control" value="{{ old('username') }}"
@@ -50,19 +56,19 @@
                         </span>
                     @endif
                 </div>
-                <div class="form-group has-feedback {{ $errors->has('password_confirmation') ? 'has-error' : '' }}">
-                    <input type="password" name="password_confirmation" class="form-control"
+                <div class="form-group has-feedback {{ $errors->has('repassword') ? 'has-error' : '' }}">
+                    <input type="password" name="repassword" class="form-control"
                            placeholder="{{ trans('adminlte::adminlte.retype_password') }}">
                     <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
-                    @if ($errors->has('password_confirmation'))
+                    @if ($errors->has('repassword'))
                         <span class="help-block">
-                            <strong>{{ $errors->first('password_confirmation') }}</strong>
+                            <strong>{{ $errors->first('repassword') }}</strong>
                         </span>
                     @endif
                 </div>
                 <div class="form-group has-feedback {{ $errors->has('description') ? 'has-error' : '' }}">
                     <input type="text" name="description" class="form-control"
-                           placeholder="Description">
+                           placeholder="Description" value="{{old('description')}}">
                     <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
                     @if ($errors->has('description'))
                         <span class="help-block">
@@ -70,6 +76,46 @@
                         </span>
                     @endif
                 </div>
+                <div class="form-group has-feedback {{ $errors->has('avatar') ? 'has-error' : '' }}">
+                    <input type="file" name="avatar" id="inputAvatar" class="form-control" value="{{old('avatar')}}" title="" placeholder="Avatar">
+                    <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
+                    @if ($errors->has('avatar'))
+                        <span class="help-block">
+                            <strong>{{ $errors->first('avatar') }}</strong>
+                        </span>
+                    @endif
+                </div>
+
+                <div class="form-group has-feedback {{ $errors->has('role') ? 'has-error' : '' }}">
+                    <select name="role" id="inputRole" class="form-control">
+                        <option value=""> -- Select role -- </option>
+                        @foreach($roles as $role)
+                            <option value="{{$role->id}}">{{$role->role_name}}</option>
+                        @endforeach
+                    </select>
+                    <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
+                    @if ($errors->has('role'))
+                        <span class="help-block">
+                            <strong>{{ $errors->first('role') }}</strong>
+                        </span>
+                    @endif
+                </div>
+
+                <div class="form-group has-feedback {{ $errors->has('manager') ? 'has-error' : '' }}">
+                    <select name="manager" id="inputManager" class="form-control">
+                        <option value=""> -- Select a manager -- </option>
+                        @foreach($managers as $manager)
+                            <option value="{{$manager->id}}">{{$manager->username}}</option>
+                        @endforeach
+                    </select>
+                    <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
+                    @if ($errors->has('manager'))
+                        <span class="help-block">
+                            <strong>{{ $errors->first('manager') }}</strong>
+                        </span>
+                    @endif
+                </div>
+
                 <button type="submit"
                         class="btn btn-primary btn-block btn-flat"
                 >{{ trans('adminlte::adminlte.register') }}</button>

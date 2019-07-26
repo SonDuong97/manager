@@ -51,8 +51,13 @@ class EditUserRequest extends FormRequest
             'manager' => [
                 'sometimes',
                 'nullable',
-                Rule::exists('roles', 'id')->where(function ($query) {
-                    $query->where('role_name', 'leader');
+//                Rule::exists('roles', 'id')->where(function ($query) {
+//                    $query->where('role_name', 'leader');
+//                }),
+                Rule::exists('users', 'id')->where(function ($query) {
+                    $query->where('role_id', function ($query) {
+                        $query->select('id')->from('roles')->where('role_name', 'manager');
+                    });
                 }),
             ],
             'role' => Rule::exists('roles', 'id')->where(function ($query) {

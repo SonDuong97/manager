@@ -27,7 +27,7 @@
         <div class="form-group">
             <label for="inputUsername" class="col-sm-2 control-label">Username</label>
             <div class="col-sm-10">
-                <input type="text" name="username" id="inputUsername" class="form-control" value="" title="" required="required">
+                <input type="text" name="username" id="inputUsername" class="form-control" value="{{old('username')}}" title="" required="required">
             </div>
         </div>
 
@@ -48,21 +48,21 @@
         <div class="form-group">
             <label for="inputEmail" class="col-sm-2 control-label">Email</label>
             <div class="col-sm-10">
-                <input type="email" name="email" id="inputEmail" class="form-control" value="" title="" required="required">
+                <input type="email" name="email" id="inputEmail" class="form-control" value="{{old('email')}}" title="" required="required">
             </div>
         </div>
 
         <div class="form-group">
             <label for="inputAvatar" class="col-sm-2 control-label">Avatar</label>
             <div class="col-sm-10">
-                <input type="file" name="avatar" id="inputAvatar" class="form-control" value="" title="">
+                <input type="file" name="avatar" id="inputAvatar" class="form-control" value="{{old('avatar')}}" title="">
             </div>
         </div>
 
         <div class="form-group">
             <label for="textDescription" class="col-sm-2 control-label">Description</label>
             <div class="col-sm-10">
-                <textarea name="description" id="textDescription" class="form-control" rows="5" cols="30" placeholder="text"></textarea>
+                <textarea name="description" id="textDescription" class="form-control" rows="5" cols="30" placeholder="text" value="{{old('description')}}"></textarea>
             </div>
         </div>
 

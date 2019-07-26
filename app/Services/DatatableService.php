@@ -13,13 +13,14 @@ class DatatableService extends BaseService implements DatatableServiceInterface
 {
     public function users()
     {
-        $users = User::select([
-            'id',
-            'username',
-            'email',
-            'role_id',
-            'manager_id',
-        ]);
+        $users = User::with('manager', 'role')
+            ->select([
+                'id',
+                'username',
+                'email',
+                'role_id',
+                'manager_id',
+            ]);
         return DataTables::of($users)
             ->addColumn('manager', function($user) {
                 if (isset($user->manager)) {

@@ -15,4 +15,6 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::post('/users/create', 'Auth\RegisterController@store')->name('users.register');
+
 Auth::routes();

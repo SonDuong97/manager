@@ -4,12 +4,10 @@ namespace App\Http\Controllers\Staff;
 
 use App\Http\Requests\Timesheet\CreateTimesheetRequest;
 use App\Http\Resources\Staff\TimesheetResource;
-use App\Models\Timesheet;
 use App\Services\Interfaces\DatatableServiceInterface;
 use App\Services\Interfaces\TimesheetServiceInterface;
 use App\Http\Controllers\Staff\Controller as StaffController;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 class TimesheetController extends StaffController
 {
@@ -42,6 +40,11 @@ class TimesheetController extends StaffController
      */
     public function create()
     {
+        if ($this->timesheetService->isDone(Auth::id())) {
+            return redirect()->back()->withErrors([
+                'message' => 'You did timesheet today!!!',
+            ]);
+        }
         return view('staff.timesheets.create');
     }
 
@@ -54,6 +57,12 @@ class TimesheetController extends StaffController
     public function store(CreateTimesheetRequest $request)
     {
         $user = Auth::user();
+
+        if ($this->timesheetService->isDone(Auth::id())) {
+            return redirect()->route('timesheets.create')->withErrors([
+                'message' => 'You did timesheet today!!!',
+            ]);
+        }
 
         if ($this->timesheetService->createTimesheet($user, $request)) {
             return redirect()->route('timesheets.create')->with(['success' => 'Create successfully!!!']);
@@ -123,10 +132,18 @@ class TimesheetController extends StaffController
     public function getTimesheetsGroupByWeek()
     {
         $timesheets = $this->timesheetService->getTimesheetsByUserIdGroupByWeek(Auth::id());
-//        $timesheets = Timesheet::selectRaw('count(*) AS cnt, created_at')->where(Timesheet::COL_USER_ID, 3)->groupBy(function ($date) {
-//            return Carbon::parse($date->created_at)->format('W');
-//        })->orderBy('cnt', 'DESC')->limit(5)->get();
-//        dd($timesheets);
-//        return $this->datatableService->timesheets($timesheets);
+
+        return response()->json([
+            'data' => $timesheets,
+        ]);
+    }
+
+    public function getTimesheetsGroupByMonth()
+    {
+        $timesheets = $this->timesheetService->getTimesheetsByUserIdGroupByMonth(Auth::id());
+
+        return response()->json([
+            'data' => $timesheets,
+        ]);
     }
 }

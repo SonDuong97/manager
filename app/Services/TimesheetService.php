@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Services\Interfaces\TimesheetServiceInterface;
 use App\Services\Service as BaseService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -161,7 +162,7 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
     }
 
     /**
-     * Check sending time is delayed or not.
+     * Check if sending time is delayed or not.
      *
      * @return bool
      */
@@ -216,7 +217,7 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
      */
     public function getTimesheetsByUserId($userId)
     {
-        $timesheets = Timesheet::where(Timesheet::COL_USER_ID, $userId);
+        $timesheets = Timesheet::with('user')->where(Timesheet::COL_USER_ID, $userId);
 
         return $timesheets;
     }
@@ -237,12 +238,42 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
      * Get timesheet by userId group by week.
      *
      * @param $userId
-     * @return Builder
+     * @return Collection
      */
     public function getTimesheetsByUserIdGroupByWeek($userId)
     {
-        return $this->getTimesheetsByUserId($userId)->groupBy(function ($date) {
+        return $this->getTimesheetsByUserId($userId)->get()->groupBy(function ($date) {
             return Carbon::parse($date->created_at)->format('W');
         });
+    }
+
+    /**
+     * Get timesheet by userId group by month.
+     *
+     * @param $userId
+     * @return Collection
+     */
+    public function getTimesheetsByUserIdGroupByMonth($userId)
+    {
+        return $this->getTimesheetsByUserId($userId)->get()->groupBy(function ($date) {
+            return Carbon::parse($date->created_at)->format('Y-m');
+        });
+    }
+
+    /**
+     * Check if staff did timesheet today or not
+     *
+     * @param $userId
+     * @return bool
+     */
+    public function isDone($userId)
+    {
+        $timesheet = Timesheet::where(Timesheet::COL_USER_ID, $userId)
+            ->whereRaw("CAST(created_at AS DATE) = '".Carbon::now()->toDateString()."'")->first();
+
+        if ($timesheet) {
+            return true;
+        }
+        return false;
     }
 }
