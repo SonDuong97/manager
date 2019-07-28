@@ -18,6 +18,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * Class TimesheetService
@@ -45,9 +46,26 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
             $tasks = $request->input('tasks');
             $taskNum = count($tasks['contents']);
             for ($i = 0; $i < $taskNum; $i++) {
+                // Validate task
+                $validator = Validator::make([
+                    'content' => $tasks['contents'][$i],
+                    'hours' => $tasks['hours'][$i],
+                ], [
+                    'content' => 'required|max:512',
+                    'hours' => 'required|numeric'
+                ]);
+
+                if ($validator->fails()) {
+                    DB::rollBack();
+                    return redirect()
+                        ->route('timesheets.create')
+                        ->withErrors($validator)
+                        ->withInput();
+                }
+
                 $task = Task::create([
                     'content' => $tasks['contents'][$i],
-                    'used_time' => $tasks['hours'][$i],
+                    'used_timesheet' => $tasks['hours'][$i],
                     'timesheet_id' => $timesheet->id,
                 ]);
             }
@@ -261,19 +279,35 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
     }
 
     /**
-     * Check if staff did timesheet today or not
+     * Check if staff did timesheet in $date or not
      *
      * @param $userId
+     * @param $date
      * @return bool
      */
-    public function isDone($userId)
+    public function isDone($userId, $date)
     {
         $timesheet = Timesheet::where(Timesheet::COL_USER_ID, $userId)
-            ->whereRaw("CAST(created_at AS DATE) = '".Carbon::now()->toDateString()."'")->first();
+//            ->whereRaw("CAST(created_at AS DATE) = '".Carbon::now()->toDateString()."'")->first();
+            ->whereRaw("CAST(created_at AS DATE) = '".$date."'")->first();
 
         if ($timesheet) {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Send mail notification to many users.
+     *
+     * @param $users
+     * @param $action
+     */
+    public function sendMailNotification($users, $action)
+    {
+        foreach ($users as $user) {
+            Mail::to($user->email)
+                ->queue(new SystemMail($action));
+        }
     }
 }

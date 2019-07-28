@@ -45,7 +45,7 @@ class UserService extends BaseService implements UserServiceInterface
         return $user->delete();
     }
 
-    public function getUserByRoleName($roleName)
+    public function getUsersByRoleName($roleName)
     {
         return Role::with('user')->where(Role::COL_ROLE_NAME, $roleName)->first()->user;
     }

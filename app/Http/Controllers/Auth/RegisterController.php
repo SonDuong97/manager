@@ -56,7 +56,7 @@ class RegisterController extends Controller
     public function showRegistrationForm()
     {
         $roles = $this->roleService->getRoleListExceptAdminRole();
-        $managers = $this->userService->getUserByRoleName(Role::ROLE_MANAGER);
+        $managers = $this->userService->getUsersByRoleName(Role::ROLE_MANAGER);
         return view('auth.register', compact('roles', 'managers'));
     }
 

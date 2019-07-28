@@ -4,19 +4,25 @@ namespace App\Http\Controllers\Staff;
 
 use App\Http\Requests\Timesheet\CreateTimesheetRequest;
 use App\Http\Resources\Staff\TimesheetResource;
+use App\Models\MailTemplate;
+use App\Models\Role;
 use App\Services\Interfaces\DatatableServiceInterface;
 use App\Services\Interfaces\TimesheetServiceInterface;
 use App\Http\Controllers\Staff\Controller as StaffController;
+use App\Services\Interfaces\UserServiceInterface;
 use Illuminate\Support\Facades\Auth;
 
 class TimesheetController extends StaffController
 {
     protected $timesheetService;
     protected $datatableService;
+
     /**
      * TimesheetsController constructor.
      */
-    public function __construct(TimesheetServiceInterface $timesheetService, DatatableServiceInterface $datatableService)
+    public function __construct(TimesheetServiceInterface $timesheetService,
+                                DatatableServiceInterface $datatableService
+    )
     {
         parent::__construct();
         $this->timesheetService = $timesheetService;
@@ -40,11 +46,11 @@ class TimesheetController extends StaffController
      */
     public function create()
     {
-        if ($this->timesheetService->isDone(Auth::id())) {
-            return redirect()->back()->withErrors([
-                'message' => 'You did timesheet today!!!',
-            ]);
-        }
+//        if ($this->timesheetService->isDone(Auth::id())) {
+//            return redirect()->back()->withErrors([
+//                'message' => 'You did timesheet today!!!',
+//            ]);
+//        }
         return view('staff.timesheets.create');
     }
 
@@ -58,9 +64,9 @@ class TimesheetController extends StaffController
     {
         $user = Auth::user();
 
-        if ($this->timesheetService->isDone(Auth::id())) {
+        if ($this->timesheetService->isDone(Auth::id(), $request->input('date'))) {
             return redirect()->route('timesheets.create')->withErrors([
-                'message' => 'You did timesheet today!!!',
+                'message' => 'You did timesheet in'.$request->input('date').'!!!',
             ]);
         }
 
@@ -146,4 +152,13 @@ class TimesheetController extends StaffController
             'data' => $timesheets,
         ]);
     }
+
+//    public function sendMailNotification($indexAction)
+//    {
+//        $actions = array([
+//            1 => MailTemplate::ACTION_TIME_TO_CREATE_TIMESHEET,
+//            2 => MailTemplate::ACTION_DEADLINE_TO_CREATE_TIMESHEET,
+//        ]);
+//        $this->timesheetService($this->userService->getUsersByRoleName(Role::ROLE_STAFF), $actions[$indexAction]);
+//    }
 }
