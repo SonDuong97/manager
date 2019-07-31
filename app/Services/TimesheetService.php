@@ -138,6 +138,23 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
 
             $tasks = $request->input('tasks');
             foreach ($tasks['contents'] as $key => $value) {
+                // Validate task
+                $validator = Validator::make([
+                    'content' => $tasks['contents'][$key],
+                    'hours' => $tasks['hours'][$key],
+                ], [
+                    'content' => 'required|max:512',
+                    'hours' => 'required|numeric'
+                ]);
+
+                if ($validator->fails()) {
+                    DB::rollBack();
+                    return redirect()
+                        ->route('timesheets.edit')
+                        ->withErrors($validator)
+                        ->withInput();
+                }
+
                 $task = Task::find($key);
                 if($task) {
                     $task->update([
