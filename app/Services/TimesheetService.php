@@ -150,7 +150,7 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
                 if ($validator->fails()) {
                     DB::rollBack();
                     return redirect()
-                        ->route('timesheets.edit')
+                        ->back()
                         ->withErrors($validator)
                         ->withInput();
                 }
